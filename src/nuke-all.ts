@@ -25,7 +25,7 @@ export async function main(ns: NS): Promise<void> {
   }
 
   servers.forEach((server) => {
-    if (ns.getServerNumPortsRequired(server) <= maxOpenablePorts) {
+    if (ns.getServerNumPortsRequired(server) <= maxOpenablePorts && !ns.hasRootAccess(server)) {
       if (ns.fileExists('BruteSSH.exe')) {
         ns.brutessh(server);
       }
@@ -48,8 +48,6 @@ export async function main(ns: NS): Promise<void> {
       ns.nuke(server);
 
       ns.tprint('Nuked ', server);
-    } else {
-      ns.tprintf('Skipping %s because it needs more than %s open ports', server, maxOpenablePorts);
     }
   });
 }

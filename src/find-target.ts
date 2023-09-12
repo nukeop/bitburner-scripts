@@ -1,5 +1,6 @@
 import { NS } from '@ns';
 import { discover } from './lib/server-discovery';
+import { formatNumber } from './lib/formatters';
 
 export async function main(ns: NS) {
   const servers = discover(ns);
@@ -33,9 +34,9 @@ export async function main(ns: NS) {
 
   const serverTable = sortedServers.map(({ server, score }) => ({
     server,
-    hackTime: ns.formatNumber(ns.getHackTime(server), 0, 1000, true),
-    score: ns.formatNumber(score, 2, 1000, true),
-    maxCash: ns.formatNumber(ns.getServerMaxMoney(server), 2, 1000, true),
+    hackTime: formatNumber(ns.getHackTime(server), ns),
+    score: formatNumber(score, ns),
+    maxCash: formatNumber(ns.getServerMaxMoney(server), ns),
   }));
 
   ns.tprintRaw(

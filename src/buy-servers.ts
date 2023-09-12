@@ -1,4 +1,5 @@
 import { NS } from '@ns';
+import { formatNumber } from './lib/formatters';
 
 export async function main(ns: NS) {
   const BASE_NAME = 'unatco-';
@@ -12,7 +13,7 @@ export async function main(ns: NS) {
     const targetRam = currentRam * 2;
     const upgradeCost = ns.getPurchasedServerUpgradeCost(server, targetRam);
     if (upgradeCost > ns.getPlayer().money) {
-      ns.tprintf('Cannot afford upgrading %s, upgrade cost: %s', server, ns.formatNumber(upgradeCost, 2, 1000, true));
+      ns.tprintf('Cannot afford upgrading %s, upgrade cost: %s', server, formatNumber(upgradeCost, ns));
       return;
     } else {
       const success = ns.upgradePurchasedServer(server, targetRam);
@@ -28,8 +29,8 @@ export async function main(ns: NS) {
   if (serverCost > ns.getPlayer().money) {
     ns.tprintf(
       'Cannot afford a server. Cost: $%s, money: $%s',
-      ns.formatNumber(serverCost, 2, 1000, true),
-      ns.formatNumber(ns.getPlayer().money, 2, 1000, true),
+      formatNumber(serverCost, ns),
+      formatNumber(ns.getPlayer().money, ns),
     );
     return;
   }
