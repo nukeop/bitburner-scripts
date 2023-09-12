@@ -1,12 +1,14 @@
-/** @param {NS} ns **/
-export async function main(ns) {
+import { NS } from '@ns';
+
+export async function main(ns: NS) {
   // helpers
   const getMoney = () => ns.getPlayer().money;
-  const getProd = (level, ram, cores) => level * 1.5 * Math.pow(1.035, ram - 1) * ((cores + 5) / 6);
+  const getProd = (level: number, ram: number, cores: number) =>
+    level * 1.5 * Math.pow(1.035, ram - 1) * ((cores + 5) / 6);
   // your production multiplier
   const PROD_MULTIPLIER = ns.getHacknetMultipliers().production;
   // maximum waiting time for collecting money for new node (default 30s)
-  const WAITING_TIME = ns.args[0] || 30;
+  const WAITING_TIME = (ns.args[0] as number) || 30;
 
   // check if you have any nodes in your hacknet
   if (!ns.hacknet.numNodes()) {

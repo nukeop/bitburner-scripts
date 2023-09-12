@@ -1,22 +1,23 @@
-import { discover } from 'discover.lib.js';
-/** @param {NS} ns */
-export async function main(ns) {
-  const target = ns.args[0] || 'n00dles';
+import { NS } from '@ns';
+import { discover } from './lib/server-discovery';
+
+export async function main(ns: NS) {
+  const target = ns.args[0].toString() || 'n00dles';
   const servers = discover(ns);
-  let securityThresh = ns.getServerMinSecurityLevel(target) + 5;
-  let moneyThresh = ns.getServerMaxMoney(target) * 0.75;
+  const securityThresh = ns.getServerMinSecurityLevel(target) + 5;
+  const moneyThresh = ns.getServerMaxMoney(target) * 0.75;
 
   let sleepTime = 3000;
-  let ramPerThread = ns.getScriptRam('/shared/weaken.js');
+  const ramPerThread = ns.getScriptRam('/shared/weaken.js');
 
-  for (let server of servers) {
+  for (const server of servers) {
     await ns.scp(['/shared/weaken.js', '/shared/grow.js', '/shared/hack.js'], server);
   }
 
   while (true) {
-    for (let server of servers) {
-      let ramAvailable = ns.getServerMaxRam(server) - ns.getServerUsedRam(server);
-      let threads = Math.floor(ramAvailable / ramPerThread);
+    for (const server of servers) {
+      const ramAvailable = ns.getServerMaxRam(server) - ns.getServerUsedRam(server);
+      const threads = Math.floor(ramAvailable / ramPerThread);
 
       if (threads > 0) {
         // if (ns.getServerSecurityLevel(target) > securityThresh || ns.formulas.hacking.hackChance(ns.getServer(target), ns.getPlayer()) > 0.99) {

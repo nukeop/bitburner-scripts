@@ -1,7 +1,7 @@
-import { discover } from 'discover.lib.js';
+import { NS } from '@ns';
+import { discover } from './lib/server-discovery';
 
-/** @param {NS} ns */
-export async function main(ns) {
+export async function main(ns: NS): Promise<void> {
   const servers = discover(ns);
 
   let maxOpenablePorts = 0;

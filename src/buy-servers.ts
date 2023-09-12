@@ -1,5 +1,6 @@
-/** @param {NS} ns */
-export async function main(ns) {
+import { NS } from '@ns';
+
+export async function main(ns: NS) {
   const BASE_NAME = 'unatco-';
   let lastPurchasedServerNumber = 0;
   const existingServerNames = ns.getPurchasedServers();

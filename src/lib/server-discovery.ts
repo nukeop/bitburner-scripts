@@ -1,10 +1,14 @@
-/** @param {NS} ns */
-export async function main(ns) {
+import { NS } from '@ns';
+
+export function discover(ns: NS) {
   let visitedServers = ['home'];
   let serversToVisit = ns.scan('home');
 
   while (serversToVisit.length > 0) {
     const currentServer = serversToVisit.pop();
+    if (!currentServer) {
+      break;
+    }
 
     const scanResult = ns.scan(currentServer);
     visitedServers = [...visitedServers, currentServer];
@@ -15,6 +19,5 @@ export async function main(ns) {
       }
     });
   }
-
-  ns.tprint(visitedServers);
+  return visitedServers;
 }

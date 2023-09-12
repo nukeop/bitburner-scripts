@@ -1,5 +1,6 @@
-/** @param {NS} ns */
-export async function main(ns) {
+import { NS } from '@ns';
+
+export async function main(ns: NS) {
   const symbols = ns.stock.getSymbols();
   const metadata = symbols.map((symbol) => {
     const forecast = ns.stock.getForecast(symbol);

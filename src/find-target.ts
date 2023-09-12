@@ -1,8 +1,8 @@
-import { discover } from 'discover.lib.js';
+import { NS } from '@ns';
+import { discover } from './lib/server-discovery';
 
-/** @param {NS} ns */
-export async function main(ns) {
-  let servers = discover(ns);
+export async function main(ns: NS) {
+  const servers = discover(ns);
   const player = ns.getPlayer();
 
   const serversWithScore = servers
