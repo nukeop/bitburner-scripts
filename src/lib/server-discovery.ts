@@ -13,11 +13,7 @@ export function discover(ns: NS) {
     const scanResult = ns.scan(currentServer);
     visitedServers = [...visitedServers, currentServer];
 
-    scanResult.forEach((server) => {
-      if (!visitedServers.includes(server)) {
-        serversToVisit = [...serversToVisit, server];
-      }
-    });
+    serversToVisit = [...serversToVisit, ...scanResult.filter((server) => !visitedServers.includes(server))];
   }
   return visitedServers;
 }

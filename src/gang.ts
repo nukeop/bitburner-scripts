@@ -89,17 +89,13 @@ export async function main(ns: NS) {
         const costB = ns.gang.getEquipmentCost(eqB);
         return costA - costB;
       })
+      .filter((equipment) => !member.upgrades.includes(equipment))
+      .filter((equipment) => ns.gang.getEquipmentStats(equipment).hack)
       .forEach((equipment) => {
-        if (!member.upgrades.includes(equipment)) {
-          const stats = ns.gang.getEquipmentStats(equipment);
-
-          if (stats.hack) {
-            const cost = ns.gang.getEquipmentCost(equipment);
-            if (cost < ns.getPlayer().money) {
-              ns.gang.purchaseEquipment(member.name, equipment);
-              ns.tprintf('Buying %s for %s, cost: $%s', equipment, member.name, formatNumber(cost, ns));
-            }
-          }
+        if (ns.getPlayer().money > ns.gang.getEquipmentCost(equipment)) {
+          const cost = ns.gang.getEquipmentCost(equipment);
+          ns.gang.purchaseEquipment(member.name, equipment);
+          ns.printf('Buying %s for %s, cost: $%s', equipment, member.name, formatNumber(cost, ns));
         }
       });
   }

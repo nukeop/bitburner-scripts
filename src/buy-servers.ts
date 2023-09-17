@@ -23,7 +23,7 @@ const buyMaxServers = (ns: NS) => {
 
   const serverCost = ns.getPurchasedServerCost(2);
   if (serverCost > ns.getPlayer().money) {
-    ns.tprintf(
+    ns.printf(
       'Cannot afford a server. Cost: $%s, money: $%s',
       formatNumber(serverCost, ns),
       formatNumber(ns.getPlayer().money, ns),
@@ -46,18 +46,18 @@ const buyMaxServers = (ns: NS) => {
 };
 
 export async function main(ns: NS) {
-  ns.tprintf('Owned servers: %s/%s', ns.getPurchasedServers().length, ns.getPurchasedServerLimit());
+  ns.printf('Owned servers: %s/%s', ns.getPurchasedServers().length, ns.getPurchasedServerLimit());
   buyMaxServers(ns);
 
   const existingServerNames = ns.getPurchasedServers();
   if (existingServerNames.length === 0) {
-    ns.tprint('No servers to upgrade');
+    ns.print('No servers to upgrade');
     return;
   }
 
   let cheapestServerToUpgrade = getCheapestServerToUpgrade(ns, existingServerNames);
 
-  ns.tprintf('Cheapest server to upgrade: %s', cheapestServerToUpgrade.name);
+  ns.printf('Cheapest server to upgrade: %s', cheapestServerToUpgrade.name);
 
   while (
     cheapestServerToUpgrade &&
@@ -69,7 +69,7 @@ export async function main(ns: NS) {
       ns.tprintf('Upgraded %s to %sGB RAM', cheapestServerToUpgrade.name, cheapestServerToUpgrade.server.maxRam * 2);
       cheapestServerToUpgrade = getCheapestServerToUpgrade(ns, existingServerNames);
     } else {
-      ns.tprintf(
+      ns.printf(
         'Could not upgrade %s to %sGB RAM',
         cheapestServerToUpgrade.name,
         cheapestServerToUpgrade.server.maxRam * 2,
@@ -78,7 +78,7 @@ export async function main(ns: NS) {
     }
   }
 
-  ns.tprintf(
+  ns.printf(
     "Can't afford to upgrade %s, cost: $%s, current money: $%s",
     cheapestServerToUpgrade.name,
     formatNumber(cheapestServerToUpgrade.cost, ns),
