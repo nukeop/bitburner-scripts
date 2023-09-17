@@ -7,6 +7,7 @@ export async function main(ns: NS) {
   const player = ns.getPlayer();
 
   const serversWithScore = servers
+    .filter((server) => ns.hasRootAccess(server))
     .map((server) => {
       let score = 0;
       const serverObj = ns.getServer(server);
@@ -44,8 +45,7 @@ export async function main(ns: NS) {
         score,
       };
     })
-    .filter((server) => server.score > 0)
-    .filter((server) => ns.hasRootAccess(server.server));
+    .filter((server) => server.score > 0);
 
   const sortedServers = serversWithScore.sort((serverA, serverB) => {
     return serverB.score - serverA.score;

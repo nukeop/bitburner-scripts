@@ -16,6 +16,24 @@ const getTaskMultiplier = (task: GangTaskStats, member: GangMemberInfo) => {
   statWeight -= 3.2 * task.difficulty;
   return statWeight;
 };
+const getAscendTreshold = (member: GangMemberInfo) => {
+  const mult = member.hack_asc_mult;
+  if (mult < 1.632) return 1.6326;
+  if (mult < 2.336) return 1.4315;
+  if (mult < 2.999) return 1.284;
+  if (mult < 3.363) return 1.2125;
+  if (mult < 4.253) return 1.1698;
+  if (mult < 4.86) return 1.1428;
+  if (mult < 5.455) return 1.1225;
+  if (mult < 5.977) return 1.0957;
+  if (mult < 6.496) return 1.0869;
+  if (mult < 7.008) return 1.0789;
+  if (mult < 7.519) return 1.073;
+  if (mult < 8.025) return 1.0673;
+  if (mult < 8.513) return 1.0631;
+  if (mult < 20) return 1.0591;
+  return 1.04;
+};
 
 export async function main(ns: NS) {
   const gangInfo = ns.gang.getGangInformation();
@@ -59,7 +77,7 @@ export async function main(ns: NS) {
 
     const ascendResult = ns.gang.getAscensionResult(member.name);
 
-    if (ascendResult && ascendResult?.hack > 1.5) {
+    if (ascendResult && ascendResult?.hack > getAscendTreshold(member)) {
       ns.gang.ascendMember(member.name);
     }
 
