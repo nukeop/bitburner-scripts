@@ -1,29 +1,25 @@
 import { NS } from '@ns';
 import { formatNumber } from './lib/formatters';
+import { minBy } from './lib/utils';
 
-export async function main(ns: NS) {
+const getCheapestServerToUpgrade = (ns: NS, servers: string[]) => {
+  const cheapestServerNameToUpgrade = minBy(servers, (server) => {
+    const targetRam = ns.getServer(server).maxRam * 2;
+    return ns.getPurchasedServerUpgradeCost(server, targetRam);
+  });
+  const cheapestServerToUpgrade = ns.getServer(cheapestServerNameToUpgrade);
+
+  return {
+    name: cheapestServerNameToUpgrade as string,
+    server: cheapestServerToUpgrade,
+    cost: ns.getPurchasedServerUpgradeCost(cheapestServerNameToUpgrade as string, cheapestServerToUpgrade.maxRam * 2),
+  };
+};
+
+const buyMaxServers = (ns: NS) => {
   const BASE_NAME = 'unatco-';
   let lastPurchasedServerNumber = 0;
   const existingServerNames = ns.getPurchasedServers();
-
-  ns.tprintf('Owned servers: %s/%s', ns.getPurchasedServers().length, ns.getPurchasedServerLimit());
-
-  existingServerNames.forEach((server) => {
-    const currentRam = ns.getServer(server).maxRam;
-    const targetRam = currentRam * 2;
-    const upgradeCost = ns.getPurchasedServerUpgradeCost(server, targetRam);
-    if (upgradeCost > ns.getPlayer().money) {
-      ns.tprintf('Cannot afford upgrading %s, upgrade cost: %s', server, formatNumber(upgradeCost, ns));
-      return;
-    } else {
-      const success = ns.upgradePurchasedServer(server, targetRam);
-      if (success) {
-        ns.tprintf('Upgraded %s to %sGB RAM', server, targetRam);
-      } else {
-        ns.tprintf('Could not upgrade %s to %sGB RAM', server, targetRam);
-      }
-    }
-  });
 
   const serverCost = ns.getPurchasedServerCost(2);
   if (serverCost > ns.getPlayer().money) {
@@ -47,4 +43,45 @@ export async function main(ns: NS) {
     }
     lastPurchasedServerNumber++;
   }
+};
+
+export async function main(ns: NS) {
+  ns.tprintf('Owned servers: %s/%s', ns.getPurchasedServers().length, ns.getPurchasedServerLimit());
+  buyMaxServers(ns);
+
+  const existingServerNames = ns.getPurchasedServers();
+  if (existingServerNames.length === 0) {
+    ns.tprint('No servers to upgrade');
+    return;
+  }
+
+  let cheapestServerToUpgrade = getCheapestServerToUpgrade(ns, existingServerNames);
+
+  ns.tprintf('Cheapest server to upgrade: %s', cheapestServerToUpgrade.name);
+
+  while (
+    cheapestServerToUpgrade &&
+    ns.getPlayer().money >
+      ns.getPurchasedServerUpgradeCost(cheapestServerToUpgrade.name, cheapestServerToUpgrade.server.maxRam * 2)
+  ) {
+    const success = ns.upgradePurchasedServer(cheapestServerToUpgrade.name, cheapestServerToUpgrade.server.maxRam * 2);
+    if (success) {
+      ns.tprintf('Upgraded %s to %sGB RAM', cheapestServerToUpgrade.name, cheapestServerToUpgrade.server.maxRam * 2);
+      cheapestServerToUpgrade = getCheapestServerToUpgrade(ns, existingServerNames);
+    } else {
+      ns.tprintf(
+        'Could not upgrade %s to %sGB RAM',
+        cheapestServerToUpgrade.name,
+        cheapestServerToUpgrade.server.maxRam * 2,
+      );
+      break;
+    }
+  }
+
+  ns.tprintf(
+    "Can't afford to upgrade %s, cost: $%s, current money: $%s",
+    cheapestServerToUpgrade.name,
+    formatNumber(cheapestServerToUpgrade.cost, ns),
+    formatNumber(ns.getPlayer().money, ns),
+  );
 }

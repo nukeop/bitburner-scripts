@@ -12,11 +12,30 @@ export async function main(ns: NS) {
       const serverObj = ns.getServer(server);
       if (ns.getServerRequiredHackingLevel(server) <= ns.getHackingLevel()) {
         if (ns.fileExists('Formulas.exe')) {
-          score =
-            ns.getServerMaxMoney(server) /
-            (ns.formulas.hacking.hackTime(serverObj, player) * ns.formulas.hacking.hackChance(serverObj, player));
+          const minimumSecurityLevel = ns.getServerMinSecurityLevel(server);
+
+          // Hack chance when security is at minimum
+          const hackChance = ns.formulas.hacking.hackChance(
+            {
+              ...serverObj,
+              hackDifficulty: minimumSecurityLevel,
+            },
+            player,
+          );
+
+          // ns.tprintf(
+          //   'Hypothetical hack chance for %s at security level %d is %s',
+          //   server,
+          //   minimumSecurityLevel,
+          //   hackChance,
+          // );
+
+          if (hackChance > 0) {
+            score = ns.getServerMaxMoney(server) / (ns.formulas.hacking.hackTime(serverObj, player) * hackChance);
+          }
         } else {
-          score = ns.getServerMaxMoney(server) / ns.getHackTime(server);
+          const hackChance = ns.hackAnalyzeChance(server);
+          score = ns.getServerMaxMoney(server) / (ns.getHackTime(server) * hackChance);
         }
       }
 
